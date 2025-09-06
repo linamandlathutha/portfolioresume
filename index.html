@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio</title>
+  <style>
+    :root{
+      --bg:#071427;            /* deep navy */
+      --bg-alt:#0c1e3b;        /* section base */
+      --text:#e6f1ff;          /* white-ish */
+      --accent:#79c0ff;        /* light blue */
+      --accent-2:#b3e0ff;      /* lighter blue */
+      --glow: 0 0 12px var(--accent), 0 0 24px var(--accent);
+      --glow-strong: 0 0 18px var(--accent-2), 0 0 36px var(--accent-2);
+      --card-radius: 18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+      background: radial-gradient(1200px 800px at 70% -10%, #0b2a56 0%, transparent 60%),
+                  radial-gradient(1000px 700px at 0% 100%, #0a2a55 0%, transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    /* Floating code background */
+    #code-canvas{
+      position:fixed; inset:0; z-index:-2;
+    }
+    .canvas-overlay{
+      position:fixed; inset:0; z-index:-1;
+      background: radial-gradient(800px 500px at 80% 20%, rgba(121,192,255,.08), transparent 60%),
+                  radial-gradient(600px 400px at 20% 80%, rgba(121,192,255,.06), transparent 60%);
+      pointer-events:none;
+    }
+
+    header{
+      position:sticky; top:0; z-index:20; backdrop-filter: blur(8px);
+      background: rgba(7,20,39,.55); border-bottom:1px solid rgba(121,192,255,.25);
+    }
+    .nav{
+      max-width:1100px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; justify-content:space-between;
+    }
+    .brand{font-weight:700; letter-spacing:.6px}
+    .brand span{color:var(--accent); text-shadow: var(--glow)}
+    .nav a{color:var(--text); text-decoration:none; margin-left:18px; opacity:.9}
+    .nav a:hover{color:var(--accent)}
+
+    .wrap{max-width:1100px; margin:0 auto; padding: 32px 20px}
+
+    section{margin: 48px 0; position:relative}
+    .card{
+      background: linear-gradient(180deg, rgba(11,32,66,.65), rgba(8,25,49,.7));
+      border:1px solid rgba(121,192,255,.25);
+      box-shadow: var(--shadow), 0 0 0 2px rgba(121,192,255,.06) inset, 0 0 35px rgba(121,192,255,.08) inset;
+      border-radius: var(--card-radius);
+      padding:28px;
+    }
+    .glow-border{ box-shadow: 0 0 0 1px rgba(121,192,255,.35), 0 0 22px rgba(121,192,255,.25); }
+
+    h1,h2,h3{line-height:1.2; margin:0 0 14px}
+    h1{font-size: clamp(28px, 5vw, 44px);}
+    h2{font-size: clamp(22px, 4vw, 32px); color:var(--accent); text-shadow: var(--glow)}
+    p{opacity:.95}
+    .muted{opacity:.75}
+
+    .grid{display:grid; gap:20px}
+    .grid-2{grid-template-columns: repeat(1,1fr)}
+    @media(min-width:860px){ .grid-2{grid-template-columns: 1.2fr .8fr} }
+
+    /* Hero */
+    .hero{ display:grid; gap:22px; align-items:center }
+    @media(min-width:900px){ .hero{grid-template-columns: 1.3fr .7fr} }
+
+    .typewriter{ font-size: clamp(18px, 2.6vw, 24px); color:var(--text); min-height:36px }
+    .cursor{ display:inline-block; width:10px; background:var(--accent); margin-left:4px; animation: blink .9s infinite }
+    @keyframes blink{ 50%{background:transparent} }
+
+    .portrait{
+      width:100%; aspect-ratio: 1/1; border-radius: 16px; background: rgba(121,192,255,.06);
+      border: 1px dashed rgba(121,192,255,.35);
+      display:grid; place-items:center; color:var(--accent-2);
+      text-align:center; padding:14px; box-shadow: var(--glow-border);
+    }
+    .portrait small{opacity:.8}
+
+    /* About */
+    .about-grid{display:grid; gap:20px}
+    @media(min-width:900px){ .about-grid{grid-template-columns: 1fr .9fr} }
+
+    .side-info{display:grid; gap:14px}
+    .info-item{display:flex; align-items:flex-start; gap:12px}
+    .icon{width:22px; height:22px; flex:none; filter: drop-shadow(0 0 6px rgba(121,192,255,.6));}
+
+    /* Focus Areas chips */
+    .chips{display:flex; flex-wrap:wrap; gap:10px}
+    .chip{border:1px solid rgba(121,192,255,.35); padding:8px 12px; border-radius:100px; font-size:14px; background: rgba(11,32,66,.5); box-shadow: var(--glow-border)}
+
+    /* Skills */
+    .skills-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:16px }
+    .skill{
+      padding:16px; border-radius:14px; border:1px solid rgba(121,192,255,.35);
+      background: linear-gradient(180deg, rgba(12,35,73,.4), rgba(9,27,53,.5));
+      display:flex; align-items:center; gap:12px; box-shadow: var(--glow-border)
+    }
+    .skill .skill-icon{ width:28px; height:28px; }
+    .skill span{ font-weight:600 }
+
+    /* Timeline */
+    .timeline{ position:relative; padding-left:28px }
+    .timeline:before{ content:""; position:absolute; left:12px; top:2px; bottom:2px; width:2px; background: linear-gradient(var(--accent), transparent) }
+    .tl-item{ position:relative; margin-bottom:18px; padding-left:8px }
+    .tl-item:before{ content:""; position:absolute; left:-20px; top:6px; width:12px; height:12px; border-radius:50%; background: var(--accent); box-shadow: 0 0 10px var(--accent) }
+    .tl-title{ font-weight:700; color:var(--accent-2) }
+    .tl-dates{ font-size:14px; opacity:.8 }
+
+    /* Projects */
+    .projects{ display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px }
+    .project{ padding:16px; border-radius:14px; border:1px solid rgba(121,192,255,.35); background: rgba(11,32,66,.5); box-shadow: var(--glow-border) }
+    .project h3{ color:var(--accent-2) }
+    .tags{display:flex; flex-wrap:wrap; gap:8px}
+    .tag{ font-size:12px; padding:6px 10px; border-radius:999px; border:1px solid rgba(121,192,255,.35); opacity:.95 }
+
+    /* CTA */
+    .cta{ display:flex; flex-wrap:wrap; gap:12px }
+    .btn{
+      appearance:none; border:none; cursor:pointer; border-radius: 12px; padding:12px 16px; font-weight:700; letter-spacing:.3px;
+      background: linear-gradient(180deg, rgba(18,56,111,1), rgba(13,40,77,1)); color:var(--text);
+      border:1px solid rgba(121,192,255,.45); box-shadow: var(--glow-border);
+      text-decoration:none; display:inline-flex; align-items:center; gap:10px;
+    }
+    .btn:hover{ box-shadow: var(--glow-strong); transform: translateY(-1px) }
+
+    footer{ text-align:center; padding: 30px 0; opacity:.7 }
+
+    /* Section titles underline */
+    .section-title{ display:inline-block; position:relative; padding-bottom:6px }
+    .section-title:after{ content:""; position:absolute; left:0; right:0; bottom:0; height:2px; background: linear-gradient(90deg, transparent, var(--accent), transparent); box-shadow: var(--glow) }
+  </style>
+</head>
+<body>
+  <!-- SVG Icons (inline so no external dependencies) -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <symbol id="i-mail" viewBox="0 0 24 24"><path fill="currentColor" d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5L4 8V6l8 5 8-5v2Z"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><path fill="currentColor" d="M6.6 10.8a15.9 15.9 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24c1.1.37 2.3.57 3.6.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C11.3 21 3 12.7 3 2a1 1 0 0 1 1-1h3.47a1 1 0 0 1 1 1c0 1.3.2 2.5.57 3.6a1 1 0 0 1-.24 1L6.6 10.8Z"/></symbol>
+      <symbol id="i-map" viewBox="0 0 24 24"><path fill="currentColor" d="M15 19.87 9 21.87l-6-2.25V4.13l6 2.25 6-2 6 2.25v15.5l-6-2.26ZM9 6.38l.02 13.24L15 17.5V4.38L9 6.38Z"/></symbol>
+      <symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.2.8-.5v-2c-3.3.7-4-1.6-4-1.6-.6-1.5-1.5-1.9-1.5-1.9-1.2-.8.1-.8.1-.8 1.3.1 2 . 1.3 1.9 2.2 3.8 5.7 2.7 7 . 2.5 . 6 1.3  2 1 . 2.6  1.2 2.5  2  2 . 3 0  3.2-1.3  4. . - . 2-.7-.2-1.3-.5-2v-1.4c0-1.8-.6-2.9-1.3-3.5 4.5-.5 9.2-2.3 9.2-10.2 0-2.3-.8-4.3-2.2-5.8.2-.6 1-2.7-.2-5.6 0 0-1.8-.6-6 2.2-1.7-.5-3.5-.7-5.3-.7s-3.6.2-5.3.7C3 1 1.2 1.6 1.2 1.6c-1.2 2.9-.4 5-.2 5.6A8.1 8.1 0 0 0 0 6.8C0 14.7 4.7 16.5 9.2 17c-.6.5-1.2 1.6-1.2 3.2v4.7c0 .3.2.6.8.5A12 12 0 0 0 12 .5Z"/></symbol>
+      <symbol id="i-linkedin" viewBox="0 0 24 24"><path fill="currentColor" d="M4.98 3.5A2.5 2.5 0 1 1 5 8.5 2.5 2.5 0 0 1 4.98 3.5ZM3 9h4v12H3V9Zm7 0h3.8v1.6h.1c.5-.9 1.7-1.9 3.5-1.9 3.7 0 4.4 2.3 4.4 5.2V21h-4v-5.4c0-1.3 0-2.9-1.8-2.9s-2 1.4-2 2.8V21h-4V9Z"/></symbol>
+      <symbol id="i-db" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C7 2 3 3.8 3 6v12c0 2.2 4 4 9 4s9-1.8 9-4V6c0-2.2-4-4-9-4Zm0 2c4.4 0 7 .9 7 2s-2.6 2-7 2-7-.9-7-2 2.6-2 7-2Zm0 6c4.4 0 7-.9 7-2v3c0 1.1-2.6 2-7 2s-7-.9-7-2V8c0 1.1 2.6 2 7 2Zm0 5c4.4 0 7-.9 7-2v3c0 1.1-2.6 2-7 2s-7-.9-7-2v-3c0 1.1 2.6 2 7 2Z"/></symbol>
+      <symbol id="i-cloud" viewBox="0 0 24 24"><path fill="currentColor" d="M6 19a4 4 0 1 1 .7-7.9A5.5 5.5 0 0 1 18 8.5a4.5 4.5 0 0 1 1 8.9H6Z"/></symbol>
+      <symbol id="i-terminal" viewBox="0 0 24 24"><path fill="currentColor" d="M3 4h18a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm2 4 4 4-4 4-1.5-1.5L6 12.5 3.5 10 5 8Zm6 8h8v-2h-8v2Z"/></symbol>
+      <symbol id="i-team" viewBox="0 0 24 24"><path fill="currentColor" d="M7 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM2 20a5 5 0 0 1 10 0v1H2v-1Zm10 1v-1a6 6 0 0 1 8.9-5.2A4.5 4.5 0 0 1 22 21v1h-10Z"/></symbol>
+    </defs>
+  </svg>
+
+  <canvas id="code-canvas"></canvas>
+  <div class="canvas-overlay" aria-hidden="true"></div>
+
+  <header>
+    <div class="nav">
+      <div class="brand">&lt;<span>LT</span> /&gt;</div>
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#education">Education</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- Hero -->
+    <section id="home" class="hero">
+      <div class="card glow-border">
+        <h1 class="section-title">Hi, I’m <span style="color:var(--accent-2); text-shadow:var(--glow)">Linamandla</span></h1>
+        <p class="muted">Aspiring technologist with a passion for building reliable systems and clean UIs.</p>
+        <div class="typewriter" id="typewriter"></div>
+        <div class="cta" style="margin-top:14px">
+          <a class="btn" href="#projects" title="See my work"><svg class="icon" viewBox="0 0 24 24"><use href="#i-terminal"/></svg> View Projects</a>
+          <a class="btn" href="#contact" title="Get in touch"><svg class="icon" viewBox="0 0 24 24"><use href="#i-mail"/></svg> Contact</a>
+        </div>
+      </div>
+      <div>
+        <div class="portrait">
+          <div>
+            <img src="IMG_0115-Photoroom.png">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="grid-2 grid">
+      <div class="card">
+        <h2 class="section-title">About Me</h2>
+        <p>
+          I’m a diligent problem-solver focused on databases, web apps, and cloud-first solutions. I enjoy turning
+          fuzzy ideas into shipped features with thoughtful UX and maintainable code.
+        </p>
+        <h3 style="margin-top:14px; color:var(--accent-2)">Objective</h3>
+        <p class="muted">Earn an internship where I can apply software engineering, database administration, and DevOps skills while learning from a great team.</p>
+        <h3 style="margin-top:14px; color:var(--accent-2)">Focus Areas</h3>
+        <div class="chips">
+          <span class="chip">Database Admin</span>
+          <span class="chip">Backend APIs</span>
+          <span class="chip">Cloud & CI/CD</span>
+          <span class="chip">Data & Reporting</span>
+          <span class="chip">Frontend UI/UX</span>
+        </div>
+      </div>
+      <aside class="card side-info">
+        <h2 class="section-title">Contact</h2>
+        <div class="info-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-mail"/></svg><div><strong>Email</strong><div class="muted">mthuthuzelithutha@gmail.com</div></div></div>
+        <div class="info-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-phone"/></svg><div><strong>Phone</strong><div class="muted">+27 82 305 4272</div></div></div>
+        <div class="info-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-map"/></svg><div><strong>Location</strong><div class="muted">South Africa</div></div></div>
+        <div class="info-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-linkedin"/></svg><div><strong>LinkedIn</strong><div class="muted"><a href="#" style="color:var(--accent-2)">www.linkedin.com/in/linamandla-thutha-b607182a7</a></div></div></div>
+        <div class="info-item"><svg class="icon" viewBox="0 0 24 24"><use href="#i-github"/></svg><div><strong>GitHub</strong><div class="muted"><a href="#" style="color:var(--accent-2)">github.com/linamandlathutha</a></div></div></div>
+      </aside>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="card">
+      <h2 class="section-title">Skills</h2>
+      <div class="skills-grid">
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-github"/></svg><span>Git & GitHub</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-db"/></svg><span>SQL / Database Admin</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-terminal"/></svg><span>ASP.NET / APIs</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-cloud"/></svg><span>Azure Basics & CI/CD</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-team"/></svg><span>Collaboration</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-terminal"/></svg><span>JavaScript</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-terminal"/></svg><span>HTML & CSS</span></div>
+        <div class="skill"><svg class="skill-icon" viewBox="0 0 24 24"><use href="#i-team"/></svg><span>Communication</span></div>
+      </div>
+    </section>
+
+    <!-- Education & Timeline -->
+    <section id="education" class="card">
+      <h2 class="section-title">Education & Timeline</h2>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-title">Diploma in Information Technology</div>
+          <div class="tl-dates">2022 – 2024</div>
+          <div class="muted">Focused on software development, databases, and systems analysis.</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-title">Projects (Academic)</div>
+          <div class="tl-dates">2023 – 2024</div>
+          <div class="muted">• Library Management with Stripe fines • Car Rental System (QR pickup) • LMS File OCR + TTS</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-title">Independent Learning</div>
+          <div class="tl-dates">2024 – Present</div>
+          <div class="muted">Azure fundamentals, DevOps pipelines, and dashboard analytics with QuestPDF reports.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="card">
+      <h2 class="section-title">Selected Projects</h2>
+      <div class="projects">
+        <article class="project">
+          <h3>Car Rental System</h3>
+          <p class="muted">End-to-end flow: vehicle listing, bookings with QR pickup, inspections with damage fees.</p>
+          <div class="tags"><span class="tag">ASP.NET</span><span class="tag">EF Core</span><span class="tag">Stripe</span></div>
+        </article>
+        <article class="project">
+          <h3>Library Fines Checkout</h3>
+          <p class="muted">Fine computation & online payment with role-based dashboards (Admin, Librarian, Student).</p>
+          <div class="tags"><span class="tag">ASP.NET</span><span class="tag">Stripe</span><span class="tag">MVC</span></div>
+        </article>
+        <article class="project">
+          <h3>LMS Materials OCR + TTS</h3>
+          <p class="muted">Extract text from PDFs with Azure Cognitive Services and read aloud in the browser.</p>
+          <div class="tags"><span class="tag">Azure</span><span class="tag">JavaScript</span><span class="tag">Bootstrap</span></div>
+        </article>
+        <article class="project">
+          <h3>Face Recognition Attendance (R&D)</h3>
+          <p class="muted">Requirement engineering + prototype exploration for Face ID-based attendance.</p>
+          <div class="tags"><span class="tag">Research</span><span class="tag">Python</span><span class="tag">Vision</span></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Contact & Resume -->
+    <section id="contact" class="card">
+      <h2 class="section-title">Get in Touch</h2>
+      <p class="muted">Open to internships such as Database Admin, Junior Software Engineer, QA, or DevOps intern.</p>
+      <div class="cta">
+        <a class="btn" href="SoftwareICT.pdf" download>
+          <svg class="icon" viewBox="0 0 24 24"><use href="#i-terminal"/></svg> Download Resume
+        </a>
+        <a class="btn" href="#" target="_blank" rel="noreferrer">
+          <svg class="icon" viewBox="0 0 24 24"><use href="#i-github"/></svg> GitHub
+        </a>
+        <a class="btn" href="#" target="_blank" rel="noreferrer">
+          <svg class="icon" viewBox="0 0 24 24"><use href="#i-linkedin"/></svg> LinkedIn
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>© <span id="year"></span> Linamandla</small>
+  </footer>
+
+  <script>
+    // ======= Floating "random code" canvas =======
+    (() => {
+      const canvas = document.getElementById('code-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [];
+      const snippets = [
+        'const x = fn() => {}', 'await fetch(\'/api\')', 'SELECT * FROM Rentals;',
+        'INSERT INTO Damages(...)', 'public IActionResult Index()', 'if(isBooked) return;'
+      ];
+      function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight }
+      addEventListener('resize', resize, {passive:true}); resize();
+      function spawn(){
+        const text = snippets[Math.floor(Math.random()*snippets.length)];
+        const x = Math.random()*W;
+        const y = -20 - Math.random()*H;
+        const speed = 0.2 + Math.random()*0.8;
+        const size = 10 + Math.random()*14;
+        const alpha = 0.5 + Math.random()*0.5;
+        particles.push({text, x, y, speed, size, alpha, dx:(Math.random()-.5)*.2});
+      }
+      for(let i=0;i<90;i++) spawn();
+      function step(){
+        ctx.clearRect(0,0,W,H);
+        for(const p of particles){
+          p.y += p.speed; p.x += p.dx;
+          if(p.y > H+30) { p.y = -30; p.x = Math.random()*W; }
+          ctx.save();
+          ctx.font = `${p.size}px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace`;
+          ctx.shadowBlur = 18; ctx.shadowColor = 'rgba(121,192,255,0.7)';
+          ctx.fillStyle = `rgba(179,224,255,${p.alpha})`;
+          ctx.fillText(p.text, p.x, p.y);
+          ctx.restore();
+        }
+        requestAnimationFrame(step);
+      }
+      step();
+    })();
+
+    // ======= Typewriter with backspacing =======
+    (() => {
+      const roles = [
+        'Database Admin Intern',
+        'Junior Software Engineer',
+        'QA / Test Analyst Intern',
+        'DevOps / Cloud Intern',
+        'Data & Reporting Intern'
+      ];
+      const el = document.getElementById('typewriter');
+      const cursor = document.createElement('span');
+      cursor.className = 'cursor';
+      let i = 0, text = '', deleting = false, roleIndex = 0;
+      function tick(){
+        const full = roles[roleIndex % roles.length];
+        if(!deleting){
+          text = full.slice(0, i++);
+        } else {
+          text = full.slice(0, i--);
+        }
+        el.textContent = text; el.appendChild(cursor);
+        if(!deleting && text === full){ deleting = true; setTimeout(tick, 1100); return }
+        if(deleting && text === ''){ deleting = false; roleIndex++; }
+        const speed = deleting ? 40 : 80;
+        setTimeout(tick, speed);
+      }
+      tick();
+    })();
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
